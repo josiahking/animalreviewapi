@@ -1,0 +1,35 @@
+﻿using AnimalReviewApp.Data;
+using AnimalReviewApp.Interfaces;
+using AnimalReviewApp.Models;
+
+namespace AnimalReviewApp.Repository
+{
+    public class ReviewRepository : IReviewInterface
+    {
+        private readonly DataContext _context;
+
+        public ReviewRepository(DataContext context)
+        {
+            _context = context;
+        }
+        public Review GetReview(int id)
+        {
+            return _context.Reviews.Where(r => r.Id == id).FirstOrDefault();
+        }
+
+        public ICollection<Review> GetReviews()
+        {
+            return _context.Reviews.ToList();
+        }
+
+        public ICollection<Review> GetReviewsOfAnimal(int animalId)
+        {
+            return _context.Reviews.Where(r => r.Animal.Id == animalId).ToList();
+        }
+
+        public bool ReviewExists(int id)
+        {
+            return _context.Reviews.Any(r => r.Id == id);
+        }
+    }
+}
