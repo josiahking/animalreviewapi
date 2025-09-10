@@ -3,6 +3,7 @@ using AnimalReviewApp.Interfaces;
 using AnimalReviewApp.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AnimalReviewApp.Controllers
 {
@@ -66,6 +67,38 @@ namespace AnimalReviewApp.Controllers
                 return BadRequest(ModelState);
             }
             return Ok(rating);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateOwner([FromQuery] int ownerId, [FromQuery] int categoryId, [FromBody] AnimalDto animalCreate )
+        {
+            if(animalCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var animal = _animalRepository.GetAnimals()
+                .Where(a => a.Name.Trim().ToUpper() == animalCreate.Name.ToUpper())
+                .FirstOrDefault();
+            if(animal != null)
+            {
+                ModelState.AddModelError("", "Animal already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var animalMap = _mapper.Map<Animal>(animalCreate);
+            if(!_animalRepository.CreateAnimal(ownerId, categoryId, animalMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+            return Ok("Successfully created");
         }
     }
 }

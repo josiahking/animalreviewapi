@@ -1,6 +1,7 @@
 ﻿using AnimalReviewApp.Dto;
 using AnimalReviewApp.Interfaces;
 using AnimalReviewApp.Models;
+using AnimalReviewApp.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,6 +65,39 @@ namespace AnimalReviewApp.Controllers
                 return BadRequest(ModelState);
             }
             return Ok(reviews);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateReviewer([FromBody] ReviewerDto reviewerCreate)
+        {
+            if (reviewerCreate == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var review = _reviewerRepository.GetReviewers()
+                .Where(r => r.LastName.Trim().ToUpper() == reviewerCreate.LastName.TrimEnd().ToUpper())
+                .FirstOrDefault();
+            if (review != null)
+            {
+                ModelState.AddModelError("", "Review already exists");
+                return StatusCode(422, ModelState);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var reviewerMap = _mapper.Map<Reviewer>(reviewerCreate);
+
+            if (!_reviewerRepository.CreateReviewer(reviewerMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
         }
     }
 }

@@ -8,5 +8,7 @@ namespace AnimalReviewApp.Interfaces
         Review GetReview(int id);
         ICollection<Review> GetReviewsOfAnimal(int animalId);
         bool ReviewExists(int id);
+        bool CreateReview(Review review);
+        bool Save();
     }
 }

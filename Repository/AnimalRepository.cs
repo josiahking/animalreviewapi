@@ -18,6 +18,29 @@ namespace AnimalReviewApp.Repository
             return _context.Animals.Any(a => a.Id == id);
         }
 
+        public bool CreateAnimal(int ownerId, int categoryId, Animal animal)
+        {
+            var animalOwnerEntity = _context.Owners.Where(a => a.Id == ownerId).FirstOrDefault();
+            var animalCategoryentity = _context.Categories.Where(a => a.Id == categoryId).FirstOrDefault();
+            var animalOwner = new AnimalOwner()
+            {
+                Owner = animalOwnerEntity,
+                Animal = animal
+            };
+
+            _context.Add(animalOwner);
+
+            var animalCategory = new AnimalCategory()
+            {
+                Category = animalCategoryentity,
+                Animal = animal
+            };
+
+            _context.Add(animalCategory);
+            _context.Add(animal);
+            return Save();
+        }
+
         public Animal GetAnimal(int id)
         {
             return _context.Animals.Where(a => a.Id == id).FirstOrDefault();
@@ -41,6 +64,11 @@ namespace AnimalReviewApp.Repository
         public ICollection<Animal> GetAnimals()
         {
             return _context.Animals.OrderBy(a => a.Id).ToList();
+        }
+
+        public bool Save()
+        {
+            return _context.SaveChanges() > 0 ? true : false;
         }
     }
 }

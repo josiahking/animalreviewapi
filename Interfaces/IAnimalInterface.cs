@@ -9,5 +9,7 @@ namespace AnimalReviewApp.Interfaces
         Animal GetAnimal(string name);
         decimal GetAnimalRating(int id);
         bool AnimalExists(int id);
+        bool CreateAnimal(int ownerId, int categoryId, Animal animal);
+        bool Save();
     }
 }
