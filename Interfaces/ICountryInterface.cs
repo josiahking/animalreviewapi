@@ -12,5 +12,6 @@ namespace AnimalReviewApp.Interfaces
         bool CreateCountry(Country country);
         bool UpdateCountry(Country country);
         bool Save();
+        bool DeleteCountry(Country country);
     }
 }

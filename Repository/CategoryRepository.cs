@@ -22,6 +22,12 @@ namespace AnimalReviewApp.Repository
             return Save();
         }
 
+        public bool DeleteCategory(Category category)
+        {
+            _context.Remove(category);
+            return Save();
+        }
+
         public ICollection<Animal> GetAnimalByCategory(int categoryId)
         {
             return _context.AnimalCategories.Where(a => a.CategoryId == categoryId).Select(a => a.Animal).ToList();
