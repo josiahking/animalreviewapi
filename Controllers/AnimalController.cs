@@ -1,6 +1,7 @@
 ﻿using AnimalReviewApp.Dto;
 using AnimalReviewApp.Interfaces;
 using AnimalReviewApp.Models;
+using AnimalReviewApp.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -13,11 +14,13 @@ namespace AnimalReviewApp.Controllers
     {
         private readonly IAnimalInterface _animalRepository;
         private readonly IMapper _mapper;
+        private readonly IReviewInterface _reviewRepository;
 
-        public AnimalController(IAnimalInterface animalRepository, IMapper mapper)
+        public AnimalController(IAnimalInterface animalRepository, IMapper mapper, IReviewInterface reviewRepository)
         {
             _animalRepository = animalRepository;
             _mapper = mapper;
+            _reviewRepository = reviewRepository;
 
         }
 
@@ -99,6 +102,42 @@ namespace AnimalReviewApp.Controllers
                 return StatusCode(500, ModelState);
             }
             return Ok("Successfully created");
+        }
+
+        [HttpPut("{animalId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
+        public IActionResult UpdateOwner(
+            int animalId,
+            [FromQuery] int ownerId,
+            [FromQuery] int categoryId,
+            [FromBody] AnimalDto updatedAnimal)
+        {
+            if (updatedAnimal == null)
+            {
+                return BadRequest(ModelState);
+            }
+            if (animalId != updatedAnimal.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_animalRepository.AnimalExists(animalId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var animalMap = _mapper.Map<Animal>(updatedAnimal);
+
+            if (!_animalRepository.UpdateAnimal(ownerId, categoryId, animalMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with updating");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
         }
     }
 }

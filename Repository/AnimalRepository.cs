@@ -70,5 +70,11 @@ namespace AnimalReviewApp.Repository
         {
             return _context.SaveChanges() > 0 ? true : false;
         }
+
+        public bool UpdateAnimal(int ownerId, int categoryId, Animal animal)
+        {
+            _context.Update(animal);
+            return Save();
+        }
     }
 }

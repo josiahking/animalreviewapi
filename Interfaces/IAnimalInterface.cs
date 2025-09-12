@@ -11,5 +11,6 @@ namespace AnimalReviewApp.Interfaces
         bool AnimalExists(int id);
         bool CreateAnimal(int ownerId, int categoryId, Animal animal);
         bool Save();
+        bool UpdateAnimal(int ownerId, int categoryId, Animal animal);
     }
 }
