@@ -12,5 +12,6 @@ namespace AnimalReviewApp.Interfaces
         bool CreateOwner(Owner owner);
         bool UpdateOwner(Owner owner);
         bool Save();
+        bool DeleteOwner(Owner owner);
     }
 }

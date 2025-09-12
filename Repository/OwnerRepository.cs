@@ -55,5 +55,11 @@ namespace AnimalReviewApp.Repository
         {
             return _context.SaveChanges() > 0 ? true : false;
         }
+
+        public bool DeleteOwner(Owner owner)
+        {
+            _context.Remove(owner);
+            return Save();
+        }
     }
 }

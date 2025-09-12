@@ -14,12 +14,19 @@ namespace AnimalReviewApp.Controllers
         private readonly IOwnerInterface _ownerRepository;
         private readonly IMapper _mapper;
         private readonly IAnimalInterface _animalRepository;
+        private readonly ICountryInterface _countryRepository;
 
-        public OwnerController(IOwnerInterface ownerRepository, IMapper mapper, IAnimalInterface animalRepository)
+        public OwnerController(
+            IOwnerInterface ownerRepository, 
+            IMapper mapper, 
+            IAnimalInterface animalRepository, 
+            ICountryInterface countryRepository
+            )
         {
             _ownerRepository = ownerRepository;
             _mapper = mapper;
             _animalRepository = animalRepository;
+            _countryRepository = countryRepository;
         }
 
         [HttpGet]
@@ -89,7 +96,7 @@ namespace AnimalReviewApp.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateOwner([FromBody] OwnerDto createOwner)
+        public IActionResult CreateOwner([FromQuery] int countryId, [FromBody] OwnerDto createOwner)
         {
             if (createOwner == null)
             {
@@ -103,7 +110,9 @@ namespace AnimalReviewApp.Controllers
                 ModelState.AddModelError("", "Owner exists");
                 return BadRequest(ModelState);
             }
+            var country = _countryRepository.GetCountry(countryId);
             var ownerMap = _mapper.Map<Owner>(createOwner);
+            ownerMap.Country = country;
             if (!_ownerRepository.CreateOwner(ownerMap))
             {
                 ModelState.AddModelError("", "Something went wrong while creating owner");
@@ -142,6 +151,30 @@ namespace AnimalReviewApp.Controllers
                 ModelState.AddModelError("", "Something went wrong with updating");
                 return StatusCode(500, ModelState);
             }
+            return NoContent();
+        }
+
+        [HttpDelete("{ownerId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCategory(int ownerId)
+        {
+            if (!_ownerRepository.OwnerExists(ownerId))
+            {
+                return NotFound();
+            }
+
+            var owner = _ownerRepository.GetOwner(ownerId);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_ownerRepository.DeleteOwner(owner))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting owner");
+            }
+
             return NoContent();
         }
     }
