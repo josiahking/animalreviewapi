@@ -62,5 +62,64 @@ namespace AnimalReviewApp.Controllers
             }
             return Ok(country);
         }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateCountry([FromBody] CountryDto createCountry)
+        {
+            if (createCountry == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var country = _countryRepository.GetCountries()
+                .Where(c => c.Name.Trim().ToUpper() == createCountry.Name.TrimEnd().ToUpper())
+                .FirstOrDefault();
+            if (country != null)
+            {
+                ModelState.AddModelError("", "Country exists");
+                return BadRequest(ModelState);
+            }
+            var countryMap = _mapper.Map<Country>(createCountry);
+            if (!_countryRepository.CreateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while creating category");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+
+        [HttpPut("{countryId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
+        public IActionResult UpdateCountry(int countryId, [FromBody] CountryDto updatedCountry)
+        {
+            if (updatedCountry == null)
+            {
+                return BadRequest(ModelState);
+            }
+            if (countryId != updatedCountry.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_countryRepository.CountryExists(countryId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var countryMap = _mapper.Map<Country>(updatedCountry);
+
+            if (!_countryRepository.UpdateCountry(countryMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with updating");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
     }
 }
