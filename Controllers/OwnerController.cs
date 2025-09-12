@@ -100,7 +100,7 @@ namespace AnimalReviewApp.Controllers
                 .FirstOrDefault();
             if (owner != null)
             {
-                ModelState.AddModelError("", "Category exists");
+                ModelState.AddModelError("", "Owner exists");
                 return BadRequest(ModelState);
             }
             var ownerMap = _mapper.Map<Owner>(createOwner);
