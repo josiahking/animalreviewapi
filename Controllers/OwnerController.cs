@@ -13,11 +13,13 @@ namespace AnimalReviewApp.Controllers
     {
         private readonly IOwnerInterface _ownerRepository;
         private readonly IMapper _mapper;
+        private readonly IAnimalInterface _animalRepository;
 
-        public OwnerController(IOwnerInterface ownerRepository, IMapper mapper)
+        public OwnerController(IOwnerInterface ownerRepository, IMapper mapper, IAnimalInterface animalRepository)
         {
             _ownerRepository = ownerRepository;
             _mapper = mapper;
+            _animalRepository = animalRepository;
         }
 
         [HttpGet]
@@ -72,8 +74,16 @@ namespace AnimalReviewApp.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetOwnerOfAnimal(int animalId)
         {
-            // todo
-            return Ok(animalId);
+            if(!_animalRepository.AnimalExists(animalId))
+            {
+                return NotFound();
+            }
+            var owner = _mapper.Map<List<OwnerDto>>(_ownerRepository.GetOwnerOfAnimal(animalId));
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(owner);
         }
     }
 }
