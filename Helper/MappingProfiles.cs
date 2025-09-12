@@ -19,6 +19,7 @@ namespace AnimalReviewApp.Helper
             CreateMap<ReviewerDto, Reviewer>();
             CreateMap<CategoryDto, Category>();
             CreateMap<CountryDto, Country>();
+            CreateMap<OwnerDto, Owner>();
         }
     }
 }

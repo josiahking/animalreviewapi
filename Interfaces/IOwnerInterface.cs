@@ -9,5 +9,8 @@ namespace AnimalReviewApp.Interfaces
         ICollection<Owner> GetOwnerOfAnimal(int animalId);
         ICollection<Animal> GetAnimalByOwner(int ownerId);
         bool OwnerExists(int id);
+        bool CreateOwner(Owner owner);
+        bool UpdateOwner(Owner owner);
+        bool Save();
     }
 }

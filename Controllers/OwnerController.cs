@@ -85,5 +85,64 @@ namespace AnimalReviewApp.Controllers
             }
             return Ok(owner);
         }
+
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateOwner([FromBody] OwnerDto createOwner)
+        {
+            if (createOwner == null)
+            {
+                return BadRequest(ModelState);
+            }
+            var owner = _ownerRepository.GetOwners()
+                .Where(c => c.LastName.Trim().ToUpper() == createOwner.LastName.TrimEnd().ToUpper())
+                .FirstOrDefault();
+            if (owner != null)
+            {
+                ModelState.AddModelError("", "Category exists");
+                return BadRequest(ModelState);
+            }
+            var ownerMap = _mapper.Map<Owner>(createOwner);
+            if (!_ownerRepository.CreateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while creating owner");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
+
+        [HttpPut("{ownerId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
+        public IActionResult UpdateOwner(int ownerId, [FromBody] OwnerDto updatedOwner)
+        {
+            if (updatedOwner == null)
+            {
+                return BadRequest(ModelState);
+            }
+            if (ownerId != updatedOwner.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_ownerRepository.OwnerExists(ownerId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var ownerMap = _mapper.Map<Owner>(updatedOwner);
+
+            if (!_ownerRepository.UpdateOwner(ownerMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with updating");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
     }
 }

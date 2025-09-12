@@ -83,7 +83,7 @@ namespace AnimalReviewApp.Controllers
             var countryMap = _mapper.Map<Country>(createCountry);
             if (!_countryRepository.CreateCountry(countryMap))
             {
-                ModelState.AddModelError("", "Something went wrong while creating category");
+                ModelState.AddModelError("", "Something went wrong while creating country");
                 return StatusCode(500, ModelState);
             }
 
