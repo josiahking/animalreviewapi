@@ -10,5 +10,6 @@ namespace AnimalReviewApp.Interfaces
         bool ReviewExists(int id);
         bool CreateReview(Review review);
         bool Save();
+        bool UpdateReview(Review review);
     }
 }

@@ -100,5 +100,37 @@ namespace AnimalReviewApp.Controllers
 
             return Ok("Successfully created");
         }
+
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
+        public IActionResult UpdateReviewer(int reviewId, [FromBody] ReviewDto updatedReview)
+        {
+            if (updatedReview == null)
+            {
+                return BadRequest(ModelState);
+            }
+            if (reviewId != updatedReview.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_reviewerRepository.ReviewerExists(reviewId))
+            {
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var reviewMap = _mapper.Map<Review>(updatedReview);
+
+            if (!_reviewRepository.UpdateReview(reviewMap))
+            {
+                ModelState.AddModelError("", "Something went wrong with updating");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
     }
 }
