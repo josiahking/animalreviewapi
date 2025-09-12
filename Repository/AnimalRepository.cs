@@ -41,6 +41,12 @@ namespace AnimalReviewApp.Repository
             return Save();
         }
 
+        public bool DeleteAnimal(Animal animal)
+        {
+            _context.Remove(animal);
+            return Save();
+        }
+
         public Animal GetAnimal(int id)
         {
             return _context.Animals.Where(a => a.Id == id).FirstOrDefault();

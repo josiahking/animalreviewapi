@@ -1,6 +1,7 @@
 ﻿using AnimalReviewApp.Dto;
 using AnimalReviewApp.Interfaces;
 using AnimalReviewApp.Models;
+using AnimalReviewApp.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -130,6 +131,30 @@ namespace AnimalReviewApp.Controllers
                 ModelState.AddModelError("", "Something went wrong with updating");
                 return StatusCode(500, ModelState);
             }
+            return NoContent();
+        }
+
+        [HttpDelete("{reviewId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (!_reviewRepository.ReviewExists(reviewId))
+            {
+                return NotFound();
+            }
+
+            var review = _reviewRepository.GetReview(reviewId);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_reviewRepository.DeleteReview(review))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting review");
+            }
+
             return NoContent();
         }
     }

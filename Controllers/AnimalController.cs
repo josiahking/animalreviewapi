@@ -139,5 +139,37 @@ namespace AnimalReviewApp.Controllers
             }
             return NoContent();
         }
+
+        [HttpDelete("{animalId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteCategory(int animalId)
+        {
+            if (!_animalRepository.AnimalExists(animalId))
+            {
+                return NotFound();
+            }
+
+            var animal = _animalRepository.GetAnimal(animalId);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var reviews = _reviewRepository.GetReviewsOfAnimal(animalId);
+
+            if(!_reviewRepository.DeleteReviews(reviews.ToList()))
+            {
+                ModelState.AddModelError("", "Something went wrong while deleting reviews for animal");
+            }
+
+            if (!_animalRepository.DeleteAnimal(animal))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting category");
+            }
+
+            return NoContent();
+        }
     }
 }
