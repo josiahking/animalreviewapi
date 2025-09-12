@@ -44,5 +44,11 @@ namespace AnimalReviewApp.Repository
         {
             return _context.SaveChanges() > 0 ? true : false;
         }
+
+        public bool UpdateReviewer(Reviewer reviewer)
+        {
+            _context.Update(reviewer);
+            return Save();
+        }
     }
 }
